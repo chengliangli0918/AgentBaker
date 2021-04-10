@@ -111,10 +111,22 @@ configureCNIIPTables() {
     fi
 }
 
+disableSystemdResolved() {
+    echo "Ignoring systemd-resolved query service but using its resolv.conf file"
+    echo "This is the simplest approach to workaround resolved issues without completely uninstalling it"
+    [ -f /run/systemd/resolve/resolv.conf ] && sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+    ls -ltr /etc/resolv.conf
+    cat /etc/resolv.conf
+}
+
 disable1804SystemdResolved() {
     ls -ltr /etc/resolv.conf
     cat /etc/resolv.conf
     echo "Disable1804SystemdResolved is false. Skipping."
+}
+
+disableSystemdIptables() {
+    systemctlDisableAndStop iptables
 }
 ensureDocker() {
     DOCKER_SERVICE_EXEC_START_FILE=/etc/systemd/system/docker.service.d/exec_start.conf

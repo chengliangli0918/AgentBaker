@@ -111,17 +111,25 @@ configureCNIIPTables() {
     fi
 }
 
+disableSystemdResolved() {
+    echo "Ignoring systemd-resolved query service but using its resolv.conf file"
+    echo "This is the simplest approach to workaround resolved issues without completely uninstalling it"
+    [ -f /run/systemd/resolve/resolv.conf ] && sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+    ls -ltr /etc/resolv.conf
+    cat /etc/resolv.conf
+}
+
 disable1804SystemdResolved() {
     ls -ltr /etc/resolv.conf
     cat /etc/resolv.conf
     UBUNTU_RELEASE=$(lsb_release -r -s)
     if [[ ${UBUNTU_RELEASE} == "18.04" ]]; then
-        echo "Ingorings systemd-resolved query service but using its resolv.conf file"
-        echo "This is the simplest approach to workaround resolved issues without completely uninstall it"
-        [ -f /run/systemd/resolve/resolv.conf ] && sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
-        ls -ltr /etc/resolv.conf
-        cat /etc/resolv.conf
+        disableSystemdResolved
     fi
+}
+
+disableSystemdIptables() {
+    systemctlDisableAndStop iptables
 }
 ensureContainerd() {
   wait_for_file 1200 1 /etc/systemd/system/containerd.service.d/exec_start.conf || exit $ERR_FILE_WATCH_TIMEOUT

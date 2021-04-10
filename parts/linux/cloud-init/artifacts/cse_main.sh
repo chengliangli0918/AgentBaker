@@ -48,6 +48,11 @@ fi
 
 disable1804SystemdResolved
 
+if [[ $OS == $MARINER_OS_NAME ]]; then
+    disableSystemdResolved
+    disableSystemdIptables
+fi
+
 if [[ $OS == $COREOS_OS_NAME ]]; then
     echo "Changing default kubectl bin location"
     KUBECTL=/opt/kubectl
